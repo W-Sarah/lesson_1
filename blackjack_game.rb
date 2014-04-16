@@ -1,5 +1,3 @@
-require 'pry'
-
 def cards_total(array)
   values = {"2" => 2, "3" => 3, "4" => 4,"5" => 5,"6" => 6,"7" => 7,"8" => 8,"9" => 9,"10" => 10, "Jack" => 10,"Queen" => 10, "King" => 10, "Ace" =>  [1, 11] }
   hand = []
@@ -12,10 +10,11 @@ def cards_total(array)
   end
 
   if hand.include?("Ace")
-    hand.delete("Ace")
-    total_1 = hand.inject(0) {|sum, card| sum + values[card]} + 1
-    total_11 = hand.inject(0) {|sum, card| sum + values[card]} + 11
-    if (total_11 == 21) 
+    non_aces = hand.select { |value| value != "Ace"}
+    aces = hand.select {|value| value == "Ace"}
+    total_1 = non_aces.inject(0) {|sum, card| sum + values[card]} + aces.to_a.length
+    total_11 = non_aces.inject(0) {|sum, card| sum + values[card]} + aces.to_a.length * 11
+    if (total_11 <= 21) 
       total = total_11
     else 
       total = total_1
@@ -45,6 +44,7 @@ puts "Please enter your name"
 name = gets.chomp
 puts
 puts "Welcome #{name}, let's play Blackjack!"
+puts "----------------"
 
 #initialize game
 deck.shuffle!
@@ -58,48 +58,53 @@ dealer_cards << deck.pop
 player_total = cards_total(player_cards)
 dealer_total = cards_total(dealer_cards)
 
-puts "#{name}, you have the following cards: #{player_cards.join("/")} for a total of #{player_total}"
-puts "The dealer has the following cards: #{dealer_cards.join("/")} for a total of #{dealer_total}"
-
-#player play
-puts
-puts "#{name}, you play first."
-puts "#{name}, would you like to (h)it or (s)tay?"
-answer = gets.chomp
-while ["h","s"].include?(answer) == false
-  puts "Please enter 'h' or 's'"
-  answer = gets.chomp
-end
-
-until answer == 's'
-  player_cards << deck.pop
-  player_total = cards_total(player_cards)
-  puts "#{name}, you have the following cards: #{player_cards.join("/")} for a total of #{player_total}"
-  break if player_total > 20
-  puts
-  puts "#{name}, would you like to (h)it or (s)tay?"
-  answer = gets.chomp
-end
+puts "#{name}, you have the following cards: #{player_cards} for a total of #{player_total}"
+puts "The dealer has the following cards: #{dealer_cards} for a total of #{dealer_total}"
 
 if player_total == 21
   puts "Blackjack! Congratulations, you win this game!"
-elsif player_total > 21
-  puts "Sorry #{name}, you have lost this game."
-else
-  puts "The dealer is going to play now"
+  else
 
-#dealer play
-until dealer_total > 17
-  dealer_cards << deck.pop
-  dealer_total = cards_total(dealer_cards)
-  puts "The dealer has the following cards: #{dealer_cards.join("/")} for a total of #{dealer_total}"
-end
+  #player play
+  puts
+  puts "#{name}, you play first."
+  puts "#{name}, would you like to (h)it or (s)tay?"
+  answer = gets.chomp
+  while ["h","s"].include?(answer) == false
+    puts "Please enter 'h' or 's'"
+    answer = gets.chomp
+  end
 
-#Comparison between the player and the dealer hand
-  if dealer_total > player_total && dealer_total < 22
+  until answer == 's'
+    player_cards << deck.pop
+    player_total = cards_total(player_cards)
+    puts "#{name}, you have the following cards: #{player_cards} for a total of #{player_total}"
+    break if player_total > 20
+    puts
+    puts "#{name}, would you like to (h)it or (s)tay?"
+    answer = gets.chomp
+  end
+
+  if player_total == 21
+    puts "Blackjack! Congratulations, you win this game!"
+  elsif player_total > 21
     puts "Sorry #{name}, you have lost this game."
   else
-    puts "Congratulations #{name}, you win this game!"
+    puts "The dealer is going to play now"
+
+  #dealer play
+  until dealer_total > 17
+    dealer_cards << deck.pop
+    dealer_total = cards_total(dealer_cards)
+    puts "The dealer has the following cards: #{dealer_cards} for a total of #{dealer_total}"
+  end
+
+  #Comparison between the player and the dealer hand
+    if dealer_total > player_total && dealer_total < 22
+      puts "Sorry #{name}, you have lost this game."
+    else
+      puts "Congratulations #{name}, you win this game!"
+    end
   end
 end
 
