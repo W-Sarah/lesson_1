@@ -1,61 +1,67 @@
-deck = {2 => 2, 3 => 3, 4 => 4,5 => 5,6 => 6,7 => 7,8 => 8,9 => 9,10 => 10, "Valet" => 10, "Queen" => 10, "King" => 10 }
+require 'pry'
 
+def cards_total(array)
+  values = {"2" => 2, "3" => 3, "4" => 4,"5" => 5,"6" => 6,"7" => 7,"8" => 8,"9" => 9,"10" => 10, "Jack" => 10,"Queen" => 10, "King" => 10, "Ace" =>  [1, 11] }
+  hand = []
+  total = 0
+  total_1 = 0
+  total_11 = 0
 
-def hit_player(array, number_of_times, name)
-deck = {2 => 2, 3 => 3, 4 => 4,5 => 5,6 => 6,7 => 7,8 => 8,9 => 9,10 => 10, "Valet" => 10,"Queen" => 10, "King" => 10 }
-  1.upto(number_of_times) do
-    array.push(deck.keys[rand(12)])
+  array.each do |suit,card|
+    hand << card
   end
-  puts "#{name}, you have the following cards: #{array.join(" ,")}"
-end
 
-def hit_dealer(array, number_of_times)
-deck = {2 => 2, 3 => 3, 4 => 4,5 => 5,6 => 6,7 => 7,8 => 8,9 => 9,10 => 10, "Valet" => 10, "Queen" => 10, "King" => 10 }
-  1.upto(number_of_times) do
-    array.push(deck.keys[rand(12)])
+  if hand.include?("Ace")
+    hand.delete("Ace")
+    total_1 = hand.inject(0) {|sum, card| sum + values[card]} + 1
+    total_11 = hand.inject(0) {|sum, card| sum + values[card]} + 11
+    if (total_11 == 21) 
+      total = total_11
+    else 
+      total = total_1
+    end
+  else total = hand.inject(0) {|sum, card| sum + values[card]}
   end
-  puts "The dealer has the following cards: #{array.join(" ,")}"
+  return total
 end
 
-def hand_sum(array)
-  deck = {2 => 2, 3 => 3, 4 => 4,5 => 5,6 => 6,7 => 7,8 => 8,9 => 9,10 => 10, "Valet" => 10, "Queen" => 10, "King" => 10 }
-  array.reduce {|sum, key| sum.to_i + deck[key].to_i}
-end
-
-
-#menu
 def menu
 puts "**** Welcome to Sarah's Casino - Blackjack Game ****"
 puts "Enter (p) to play Blackjack or (e) to exit the game"
 gets.chomp
 end
 
+#variables
+suits = [ "D", "H", "C", "S"]
+cards = ["2", "3", "4", "5", "6", "7", "8", "9", "10", "Jack", "Queen", "King", "Ace"]
+deck = suits.product(cards)
 
-
-#running the app
-
+#menu
 input = menu
-
 while input != "e"
-  if input == "p"
 
+  if input == "p"
 puts "Please enter your name"
 name = gets.chomp
 puts
 puts "Welcome #{name}, let's play Blackjack!"
 
 #initialize game
-puts ""
-player = []
-dealer = []
-player_hand_sum = 0
-dealer_hand_sum = 0
-hit_player(player,2, name)
-player_hand_sum = hand_sum(player)
-hit_dealer(dealer, 2)
-dealer_hand_sum = hand_sum(dealer)
+deck.shuffle!
+player_cards = []
+dealer_cards = []
+player_cards << deck.pop
+dealer_cards << deck.pop
+player_cards << deck.pop
+dealer_cards << deck.pop
 
- #player play
+player_total = cards_total(player_cards)
+dealer_total = cards_total(dealer_cards)
+
+puts "#{name}, you have the following cards: #{player_cards.join("/")} for a total of #{player_total}"
+puts "The dealer has the following cards: #{dealer_cards.join("/")} for a total of #{dealer_total}"
+
+#player play
 puts
 puts "#{name}, you play first."
 puts "#{name}, would you like to (h)it or (s)tay?"
@@ -66,45 +72,43 @@ while ["h","s"].include?(answer) == false
 end
 
 until answer == 's'
-  hit_player(player, 1, name)
-  player_hand_sum = hand_sum(player)
-  break if player_hand_sum > 20
+  player_cards << deck.pop
+  player_total = cards_total(player_cards)
+  puts "#{name}, you have the following cards: #{player_cards.join("/")} for a total of #{player_total}"
+  break if player_total > 20
   puts
   puts "#{name}, would you like to (h)it or (s)tay?"
   answer = gets.chomp
 end
-if player_hand_sum == 21
+
+if player_total == 21
   puts "Blackjack! Congratulations, you win this game!"
-elsif player_hand_sum > 21
+elsif player_total > 21
   puts "Sorry #{name}, you have lost this game."
 else
   puts "The dealer is going to play now"
+
+#dealer play
+until dealer_total > 17
+  dealer_cards << deck.pop
+  dealer_total = cards_total(dealer_cards)
+  puts "The dealer has the following cards: #{dealer_cards.join("/")} for a total of #{dealer_total}"
 end
 
- #dealer play
- until dealer_hand_sum > 17
-  hit_dealer(dealer, 1)
-  dealer_hand_sum = hand_sum(dealer)
+#Comparison between the player and the dealer hand
+  if dealer_total > player_total && dealer_total < 22
+    puts "Sorry #{name}, you have lost this game."
+  else
+    puts "Congratulations #{name}, you win this game!"
+  end
 end
-
-
-
-
-
-
-
-
-
-
-
-
-
 
   else 
-    puts "Please enter (p) or (e)"
+    puts "Invalid - Please enter (p) or (e)"
   end
 
   puts "press any key to go back to the menu"
   gets
   input = menu
 end
+
