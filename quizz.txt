@@ -1,0 +1,25 @@
+1. a is still equal to 1
+2. Array are ordered list of values that are indexed by a number
+Hashes are unordered list of values that are indexed by a key
+
+3. 
+[1,2,3,3]
+[1,2,3]
+[1,2,3]
+
+4. the map method passes a block for each element of an Array. it returns the new changed Array
+the select method select the values of the array for which the expression in the block is true. It returns the array made of the selected values
+
+Select the even values of an array
+[1,2,3,4,5,6,7,8].select {|value| value % 2 == 0} ==> [2,4,6,8]
+
+Multiply all values by 2
+[1,2,3,4,5,6,7,8].map {|value| value * 2} ==> [2,4,6,8,10,12,14,16]
+
+5. In an hash, if I wanted the keys to be string and not symbol I would use the hash rocket
+
+6. "No Way!"
+
+7. x = 4
+
+8. Undefined local variable : x
